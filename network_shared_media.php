@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Netword_Shared_Media
- * @version 0.9.5
+ * @version 0.9.6
  */
 /*
 Plugin Name: Network Shared Media
@@ -9,7 +9,7 @@ Plugin URI: http://wordpress.org/extend/plugins/network-shared-media/
 Description: This plugin adds a new tab to the "Add Media" window, allowing you to access media in other sites. Based on an idea of Aaron Eaton
 Author: Joost de Keijzer
 Author URI: http://dekeijzer.org/
-Version: 0.9.5
+Version: 0.9.6
 Licence: GPLv2 or later
 
 Code development at https://github.com/joostdekeijzer/wp_network_shared_media
@@ -294,7 +294,36 @@ class network_shared_media {
 	
 	<?php wp_nonce_field('media-form'); ?>
 	<?php //media_upload_form( $errors ); ?>
-	
+
+	<?php
+		if( isset($_GET['chromeless']) && $_GET['chromeless'] ):
+			// WP3.5+ Media Browser calls iframe 'chromeless' and handles inserting differently
+	?>
+	<script type="text/javascript">
+	/* <![CDATA[ */
+	function nsm_media_send_to_editor(htmlString) {
+		<?php /* copied from /wp-admin/includes/media.php media_send_to_editor() */ ?>
+		var win = window.dialogArguments || opener || parent || top;
+		win.send_to_editor(htmlString);
+	}
+
+	jQuery(function($){
+		$('input[id^=send].button').click(function(event) {
+			event.preventDefault();
+			var $this = $(event.target);
+			var form = $('#library-form');
+			var result = $.ajax({
+				url: form.attr('action'),
+				type: form.attr('method'),
+				data: form.serialize() + '&' + encodeURIComponent($this.attr('id') ) + '=true&chromeless=1',
+				success: nsm_media_send_to_editor
+			});
+		});
+	});
+	/* ]]> */
+	</script>
+	<?php endif; /* chromeless */ ?>
+
 	<script type="text/javascript">
 	<!--
 	jQuery(function($){
