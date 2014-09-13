@@ -127,4 +127,3 @@ This plugin only shows sites which attributes are set as follows:
 
 = 0.5 =
 * first public version
-
